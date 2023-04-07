@@ -35,14 +35,14 @@ user_router.get('/:id', (req, res) => {
 user_router.post('', validate, (req, res) => {
     let newUser = {
         id: arr.length + 1,
-        name: req.body.name,
-        email: req.body.email,
+        fullname: req.body.fullname,
+        gender: req.body.gender,
         age: req.body.age
     };
     arr.push(newUser);
     // write the updated users array to the users.json file
     fs.writeFileSync(usersFilePath, JSON.stringify(arr));
-    return res.status(201).json(arr[arr.length -1 ]);
+    return res.status(201).json(arr[arr.length -1]);
 })
 
 // delete user by id
