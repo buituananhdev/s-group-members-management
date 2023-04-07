@@ -1,6 +1,8 @@
 const express = require('express');
 const user_router = express.Router();
-
+const validate = require('../middlewares/validate');
+user_router.use(express.json());
+user_router.use(express.urlencoded({ extended: true }));
 const fs = require('fs');
 const path = require('path');
 // get the path to the users.json file
@@ -30,7 +32,7 @@ user_router.get('/:id', (req, res) => {
 })
 
 // add new user
-user_router.post('', (req, res) => {
+user_router.post('', validate, (req, res) => {
     let newUser = {
         id: arr.length + 1,
         name: req.body.name,
@@ -58,7 +60,7 @@ user_router.delete('/:id', (req, res) => {
 
 
 // update user by id
-user_router.put('/:id', (req, res) => {
+user_router.put('/:id', validate, (req, res) => {
     const id = parseInt(req.params.id);
     const userIndex = arr.findIndex((user) => user.id === id);
     if (userIndex === -1) {
