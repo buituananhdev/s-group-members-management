@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "eslint": "^8.37.0",
+    "express": "^4.18.2",
+    "fs-extra": "^11.1.1",
+    "unidecode": "^0.1.8"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.1.1"
+  }
+}
