@@ -12,4 +12,4 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/users', userRoutes);
 // ... Other routes
 
-app.listen(3000, () => console.log('Server started on port 3000'));
+app.listen(8000, () => console.log('Server started on port 8000'));

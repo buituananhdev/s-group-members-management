@@ -3,74 +3,93 @@ const user_router = express.Router();
 const validate = require('../middlewares/validate');
 user_router.use(express.json());
 user_router.use(express.urlencoded({ extended: true }));
-const fs = require('fs');
-const path = require('path');
-// get the path to the users.json file
-// eslint-disable-next-line no-undef
-const usersFilePath = path.join(__dirname, '../data/users.json');
-console.log(usersFilePath)
-
-let arr = [];
-if (fs.existsSync(usersFilePath)) {
-    arr = JSON.parse(fs.readFileSync(usersFilePath));
-}
-
+const connection = require('../database/connection');
 // get all users
 user_router.get('', (req, res) => {
-    return res.status(200).json(arr);
-})
+    connection.query('SELECT * FROM Users', (error, results) => {
+        if (error) {
+            throw error;
+        }
+        return res.json(results);
+    });
+});
 
 // get information user by id
 user_router.get('/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const userFind = arr.find((user) => user.id === id);
-    if (userFind) {
-        return res.status(200).json(userFind);
-    } else {
-        return res.status(400).json("User not found!");
-    }
-})
+    const query = 'SELECT * FROM Users WHERE id = ?';
+    connection.query(
+        query,
+        [id],
+        (error, results) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).send('Error retrieving user');
+            }
+            if (results.length === 0) {
+                return res.status(404).send('User not found');
+            }
+            return res.send(results[0]);
+        }
+    );
+});
 
 // add new user
 user_router.post('', validate, (req, res) => {
-    let newUser = {
-        id: arr.length + 1,
-        fullname: req.body.fullname,
-        gender: req.body.gender,
-        age: req.body.age
-    };
-    arr.push(newUser);
-    // write the updated users array to the users.json file
-    fs.writeFileSync(usersFilePath, JSON.stringify(arr));
-    return res.status(201).json(arr[arr.length -1]);
-})
+    const { fullname, gender, age } = req.body;
+    const query =
+        'INSERT INTO Users (fullname, gender, age) VALUES (?, ?, ?)';
+    connection.query(
+        query,
+        [fullname, gender, age],
+        (error) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).send('Error inserting new item');
+            }
+            return res.status(201).send('New item inserted successfully');
+        }
+    );
+});
 
 // delete user by id
 user_router.delete('/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const userIndex = arr.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-        res.status(404).send(`User with id ${id} not found`);
-        return;
-    }
-    arr = arr.filter((user) => user.id !== id);
-    fs.writeFileSync(usersFilePath, JSON.stringify(arr));
-    res.status(204).end();
+    const query = 'DELETE FROM Users WHERE id = ?';
+    connection.query(
+        query,
+        [id],
+        (error, results) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).send('Error deleting user');
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).send('User not found');
+            }
+            return res.status(200).send('User deleted successfully');
+        }
+    );
 });
 
-
-// update user by id
 user_router.put('/:id', validate, (req, res) => {
     const id = parseInt(req.params.id);
-    const userIndex = arr.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-        res.status(404).send(`User with id ${id} not found`);
-        return;
-    }
-    const userUpdate = Object.assign({}, arr[userIndex], req.body);
-    arr[userIndex] = userUpdate;
-    fs.writeFileSync(usersFilePath, JSON.stringify(arr));
-    res.status(204).end();
+    const { fullname, gender, age } = req.body;
+    const query = 'UPDATE Users SET fullname = ?, gender = ?, age = ? WHERE id = ?';
+    connection.query(
+        query,
+        [fullname, gender, age, id],
+        (error, results) => {
+            if (error) {
+                console.error(error);
+                return res.status(500).send('Error updating user');
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).send(`User with id ${id} not found`);
+            }
+            return res.status(204).end();
+        }
+    );
 });
 
 // Exports cho biến user_router

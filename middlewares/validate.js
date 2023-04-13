@@ -18,11 +18,13 @@
 //     next();
 // }
 
-// BAO TEST :V
 function validate(req, res, next) {
     const regex = /^[a-zA-Z\u00C0-\u024F\u1EA0-\u1EF9 ]+$/;
     if (!regex.test(req.body.fullname)) {
-        return res.status(400).json('Ten khong duoc chua ki tu so va ki tu dac biet!');
+        return res.status(400).json('Full name cannot contain numbers and special characters!');
+    }
+    if (req.body.age <= 0) {
+        return res.status(400).json('Age must be greater than 0!');
     }
     next();
 }
