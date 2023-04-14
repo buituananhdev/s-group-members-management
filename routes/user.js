@@ -1,6 +1,6 @@
 const express = require('express');
 const user_router = express.Router();
-const validate = require('../middlewares/validate');
+const validate = require('../middleware/validate');
 user_router.use(express.json());
 user_router.use(express.urlencoded({ extended: true }));
 const connection = require('../database/connection');
