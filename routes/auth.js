@@ -1,64 +1,62 @@
 const express = require('express');
+const crypto = require('crypto');
+//const authentication = require('../middleware/authentication');
 const jwt = require('jsonwebtoken');
 const auth = express.Router();
+const mailService = require('../services/mailService');
 const { validate_login } = require('../middleware/validate');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
-const connection = require('../database/connection');
+const knex = require('../database/connection');
 const hashPassword = require('../middleware/hashPassword');
 
-auth.post('/register', (req, res) => {
-    const { fullname, gender, age, username, password } = req.body;
-    const query1 = 'SELECT * FROM Users WHERE username = ?';
-    let check = false;
-    connection.query(query1, [username], (error, results) => {
-        if (error) {
-            console.error(error);
-            check = true;
-            return res.status(500).send('Error retrieving user');
+auth.post('/register', async (req, res) => {
+    const { fullname, gender, age, username, password, email } = req.body;
+
+    try {
+        const [user] = await knex('Users').select().where('username', username);
+        if (user) {
+            return res.status(404).send('Username already exists');
         }
-        if (results.length != 0) {
-            check = true;
-            return res.status(404).send('Username already exist');
-        }
-    });
-    if(check) {
-        return;
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error retrieving user');
     }
+
     const { hashPass, salt } = hashPassword(password);
-    // insert to db
-    const query2 =
-        'INSERT INTO Users (fullname, gender, age, username, password, salt) VALUES (?, ?, ?, ?, ?, ?)';
-    connection.query(
-        query2,
-        [fullname, gender, age, username, hashPass, salt],
-        (error) => {
-            if (error) {
-                console.error(error);
-                return res.status(500).send('Error register');
-            }
-            return res.status(201).send('Register successfully');
-        }
-    );
+
+    try {
+        await knex('Users').insert({
+            fullname,
+            gender,
+            age,
+            username,
+            password: hashPass,
+            salt,
+            email,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error register');
+    }
+
+    return res.status(201).send('Register successfully');
 });
 
-auth.post('/login', validate_login, (req, res) => {
+auth.post('/login', validate_login, async (req, res) => {
     const { username, password } = req.body;
-    const query = 'SELECT * FROM Users WHERE username = ?';
-    connection.query(query, [username], (error, results) => {
-        if (error) {
-            console.error(error);
-            return res.status(500).send('Error retrieving user');
+
+    try {
+        const users = await knex('Users').select().where('username', username);
+        if (users.length === 0) {
+            return res.status(404).send('Username does not exist');
         }
-        if (results.length === 0) {
-            return res.status(404).send('User not found');
-        }
-        const userFind = results[0];
+
+        const userFind = users[0];
         const { hashPass } = hashPassword(password, userFind.salt);
         if (hashPass === userFind.password) {
-            var token = jwt.sign(
-                { username: username },
-                // eslint-disable-next-line no-undef
+            const token = jwt.sign(
+                { username: username, user_id: userFind.id },
                 process.env.SECRET_KEY,
                 {
                     algorithm: 'HS256',
@@ -69,11 +67,73 @@ auth.post('/login', validate_login, (req, res) => {
             return res
                 .status(200)
                 .json({ status: 'success', access_token: token });
-        } 
-        return res.status(400).json({
-            message: 'Invalid username or password',
-        });
-    });
+        } else {
+            return res.status(400).json({
+                message: 'Invalid username or password',
+            });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error retrieving user');
+    }
 });
+
+auth.post('/forgot', (req, res) => {
+    const { emailForm, emailTo, emailSubject, emailText } = req.body;
+    try {
+        let result = mailService.sendMail({
+            emailForm,
+            emailTo,
+            emailSubject,
+            emailText,
+        });
+        if (result) {
+            res.status(200).send('Email sent successfully');
+        } else {
+            res.status(400).send('Error occurred while sending email');
+        }
+    } catch (err) {
+        console.error(err);
+        res.send('Error occurred while sending email');
+    }
+});
+
+auth.post('/reset_password', async (req, res) => {
+    try {
+        const { email, new_pass, token } = req.body;
+        const user = await knex('Users').select().where('email', email).first();
+
+        if (!user) {
+            return res.status(404).send('Email does not exist');
+        }
+
+        if (!token) {
+            return res.status(401).json({
+                message: 'Invalid token',
+            });
+        }
+
+        const verify = jwt.verify(token, process.env.SECRET_KEY);
+
+        if (verify) {
+            const salt = bcrypt.genSaltSync(10);
+            const hashPass = bcrypt.hashSync(new_pass, salt);
+
+            await knex('Users')
+                .where('email', email)
+                .update({ password: hashPass, salt: salt });
+
+            return res.status(200).send('Update successfully');
+        }
+
+        return res.status(401).json({
+            message: 'Invalid token',
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send('Error');
+    }
+});
+
 // Exports cho biến user_router
 module.exports = auth;

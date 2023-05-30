@@ -1,23 +1,26 @@
 const connection = require('../database/connection');
+require('dotenv').config();
 
-const createTableSql = `CREATE TABLE IF NOT EXISTS abc (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        fullname VARCHAR(30),
-        gender INT,
-        age INT CHECK(age > 0))`;
-connection.query(createTableSql, (err) => {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log('Table created successfully');
-    }
-});
+async function createTable() {
+    const createTableSql = `CREATE TABLE IF NOT EXISTS Users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    fullname VARCHAR(30),
+    username VARCHAR(30),
+    password VARCHAR(500),
+    email NVARCHAR(30),
+    salt NVARCHAR(100),
+    gender INT,
+    age INT CHECK(age > 0))`;
+    await connection.query(createTableSql);
+}
 
-const query = "INSERT INTO Users (fullname, gender, age) VALUES ('Bui Tuan Anh', true, 18), ('Bui Tuan Anh', true, 20), ('Nguyen Huy Tuong', true, 20)";
-connection.query(query, (err) => {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log('Data inserted successfully');
-    }
-});
+createTable();
+
+// const query = "INSERT INTO Users (fullname, username, password, email, gender, age) VALUES ('Bui Tuan Anh', 'anh', '123','anhaanh2003@gmail.com', true, 18)";
+// connection.query(query, (err) => {
+//     if (err) {
+//         console.error(err);
+//     } else {
+//         console.log('Data inserted successfully');
+//     }
+// });
