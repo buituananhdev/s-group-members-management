@@ -7,14 +7,20 @@ const mailService = require('../services/mailService');
 const { validate_login } = require('../middleware/validate');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
-const knex = require('../database/connection');
 const hashPassword = require('../middleware/hashPassword');
+const {
+    getUsers,
+    getUserByInformation,
+    addUser,
+    deleteUserById,
+    updateUser,
+} = require('../database/DataContext');
 
 auth.post('/register', async (req, res) => {
     const { fullname, gender, age, username, password, email } = req.body;
 
     try {
-        const [user] = await knex('Users').select().where('username', username);
+        const user = await getUserByInformation('username', username);
         if (user) {
             return res.status(404).send('Username already exists');
         }
@@ -22,18 +28,16 @@ auth.post('/register', async (req, res) => {
         console.error(error);
         return res.status(500).send('Error retrieving user');
     }
-
-    const { hashPass, salt } = hashPassword(password);
-
+    const created_by = null;
     try {
-        await knex('Users').insert({
+        await addUser({
             fullname,
             gender,
             age,
-            username,
-            password: hashPass,
-            salt,
+            created_by,
             email,
+            username,
+            password,
         });
     } catch (error) {
         console.error(error);
@@ -45,18 +49,12 @@ auth.post('/register', async (req, res) => {
 
 auth.post('/login', validate_login, async (req, res) => {
     const { username, password } = req.body;
-
     try {
-        const users = await knex('Users').select().where('username', username);
-        if (users.length === 0) {
-            return res.status(404).send('Username does not exist');
-        }
-
-        const userFind = users[0];
-        const { hashPass } = hashPassword(password, userFind.salt);
-        if (hashPass === userFind.password) {
+        const user = await getUserByInformation('username', username);
+        const { hashPass } = hashPassword(password, user.salt);
+        if (hashPass === user.password) {
             const token = jwt.sign(
-                { username: username, user_id: userFind.id },
+                { username: username, user_id: user.id },
                 process.env.SECRET_KEY,
                 {
                     algorithm: 'HS256',
