@@ -43,4 +43,4 @@ const users = [
     },
 ];
 
-await connection('Users').insert(users);
+await knex('Users').insert(users);
