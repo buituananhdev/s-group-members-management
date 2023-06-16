@@ -5,24 +5,19 @@ const hashPassword = require('../middleware/hashPassword');
 // Function to retrieve users with pagination
 const getUsers = async (page, pageSize, email, fullname) => {
     const offset = (page - 1) * pageSize;
-
     const query = knex('Users')
         .select('*')
         .where('email', 'like', `%${email}%`)
         .andWhere('fullname', 'like', `%${fullname}%`)
         .offset(offset)
         .limit(pageSize);
-
     const users = await query;
-
     const totalCountQuery = knex('Users')
         .count('id as count')
         .where('email', 'like', `%${email}%`)
         .andWhere('fullname', 'like', `%${fullname}%`);
     const totalCount = await totalCountQuery;
-
     const totalPages = Math.ceil(totalCount[0].count / pageSize);
-
     return {
         users,
         totalPages,
@@ -33,10 +28,6 @@ const getUsers = async (page, pageSize, email, fullname) => {
 // Function to get user information by id
 const getUserByInformation = async (type, data) => {
     const [user] = await knex('Users').select('*').where(type, data);
-    if (!user) {
-        throw new Error('User not found');;
-    }
-
     return user;
 };
 
@@ -58,11 +49,9 @@ const addUser = async (userData) => {
             password: hashPass,
             salt: salt,
         });
-
         return user;
     } catch (error) {
         console.error(error);
-        throw new Error('Error adding user');
     }
 };
 
@@ -70,33 +59,22 @@ const addUser = async (userData) => {
 const deleteUserById = async (id) => {
     try {
         const deletedUser = await knex('Users').where('id', id).del();
-
-        if (deletedUser === 0) {
-            throw new Error('User not found');
-        }
-
         return deletedUser;
     } catch (error) {
         console.error(error);
-        throw new Error('Error deleting user');
     }
 };
 
 // Function to update a user
 const updateUser = async (id, userData) => {
     const { fullname, gender, age } = userData;
-
     try {
         const result = await knex('Users')
             .where('id', id)
             .update({ fullname, gender, age });
-
-        if (result === 0) {
-            throw new Error(`User with id ${id} not found`);
-        }
+        return result;
     } catch (error) {
         console.error(error);
-        throw new Error('Error updating user');
     }
 };
 

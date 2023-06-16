@@ -11,7 +11,7 @@ const {
     addUser,
     deleteUserById,
     updateUser,
-} = require('../database/DataContext');
+} = require('../database/UserContext');
 
 // Get users with pagination
 user_router.get('', authentication, async (req, res) => {
@@ -48,6 +48,11 @@ user_router.get('/:id', authentication, async (req, res) => {
 
     try {
         const user = await getUserByInformation('id', id);
+        if (!user) {
+            return res
+                .status(400)
+                .send({ status: 'failure', message: 'User not found' });
+        }
         return res.status(200).json({ status: 'success', data: user });
     } catch (error) {
         console.error(error);
@@ -81,7 +86,9 @@ user_router.post(
             return res.status(200).json({ status: 'success', data: user });
         } catch (error) {
             console.error(error);
-            return res.status(500).send('Error adding user');
+            return res
+                .status(404)
+                .send({ status: 'failure', message: 'Error adding user' });
         }
     }
 );
@@ -91,11 +98,20 @@ user_router.delete('/:id', authentication, async (req, res) => {
     const id = parseInt(req.params.id);
 
     try {
-        await deleteUserById(id);
-        return res.status(200).send('User deleted successfully');
+        const result = await deleteUserById(id);
+        if (!result) {
+            return res
+                .status(404)
+                .send({ status: 'failure', message: 'User not found' });
+        }
+        return res
+            .status(200)
+            .send({ status: 'success', message: 'User deleted successfully' });
     } catch (error) {
         console.error(error);
-        return res.status(404).send('User not found');
+        return res
+                .status(404)
+                .send({ status: 'failure', message: 'Error remove user' });
     }
 });
 
@@ -105,7 +121,12 @@ user_router.put('/:id', authentication, validate_name, async (req, res) => {
     const { fullname, gender, age } = req.body;
 
     try {
-        await updateUser(id, { fullname, gender, age });
+        const result = await updateUser(id, { fullname, gender, age });
+        if (!result) {
+            return res
+                .status(400)
+                .send({ status: 'failure', message: 'User not found ' });
+        }
         return res.status(204).end();
     } catch (error) {
         console.error(error);

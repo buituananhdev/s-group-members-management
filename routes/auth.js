@@ -1,6 +1,4 @@
 const express = require('express');
-const crypto = require('crypto');
-//const authentication = require('../middleware/authentication');
 const jwt = require('jsonwebtoken');
 const auth = express.Router();
 const mailService = require('../services/mailService');
@@ -9,12 +7,9 @@ auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
 const hashPassword = require('../middleware/hashPassword');
 const {
-    getUsers,
     getUserByInformation,
-    addUser,
-    deleteUserById,
-    updateUser,
-} = require('../database/DataContext');
+    addUser
+} = require('../database/UserContext');
 
 auth.post('/register', async (req, res) => {
     const { fullname, gender, age, username, password, email } = req.body;
@@ -30,7 +25,7 @@ auth.post('/register', async (req, res) => {
     }
     const created_by = null;
     try {
-        await addUser({
+        const result = await addUser({
             fullname,
             gender,
             age,
@@ -39,18 +34,20 @@ auth.post('/register', async (req, res) => {
             username,
             password,
         });
+        return res.status(201).send({status: 'success', data: result});
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error register');
     }
-
-    return res.status(201).send('Register successfully');
 });
 
 auth.post('/login', validate_login, async (req, res) => {
     const { username, password } = req.body;
     try {
         const user = await getUserByInformation('username', username);
+        if (!user) {
+            return res.status(400).send({ status: 'failure', message: 'User not found'});
+        }
         const { hashPass } = hashPassword(password, user.salt);
         if (hashPass === user.password) {
             const token = jwt.sign(
