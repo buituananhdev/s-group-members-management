@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const auth = express.Router();
-const mailService = require('../services/mailService');
+const mailService = require('../services/mail.service');
 const { validate_login } = require('../middleware/validate');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
@@ -11,8 +11,12 @@ const {
     addUser
 } = require('../database/UserContext');
 
+const {
+    createUserRole,
+    getUserRole
+} = require('../database/AuthorizationContext')
 auth.post('/register', async (req, res) => {
-    const { fullname, gender, age, username, password, email } = req.body;
+    const { fullname, gender, age, username, password, email, role_id } = req.body;
 
     try {
         const user = await getUserByInformation('username', username);
@@ -34,6 +38,7 @@ auth.post('/register', async (req, res) => {
             username,
             password,
         });
+        await createUserRole(result.id, role_id);
         return res.status(201).send({status: 'success', data: result});
     } catch (error) {
         console.error(error);
@@ -50,8 +55,10 @@ auth.post('/login', validate_login, async (req, res) => {
         }
         const { hashPass } = hashPassword(password, user.salt);
         if (hashPass === user.password) {
+            const userRole = await getUserRole(user.id);
+            console.log('role =', userRole);
             const token = jwt.sign(
-                { username: username, user_id: user.id },
+                { username: username, user_id: user.id, user_role: userRole },
                 process.env.SECRET_KEY,
                 {
                     algorithm: 'HS256',
