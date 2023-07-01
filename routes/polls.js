@@ -1,6 +1,6 @@
 const express = require('express');
 const poll_router = express.Router();
-const authentication = require('../middleware/authentication');
+const authentication = require('../middleware/Authentication');
 poll_router.use(express.json());
 poll_router.use(express.urlencoded({ extended: true }));
 const {
@@ -13,7 +13,7 @@ const {
     updateOption,
     deletePoll,
 } = require('../database/PollContext');
-const getCreatedBy = require('../middleware/getCreatedBy');
+const getCreatedBy = require('../helpers/GetCreatedBy');
 
 // Create new poll
 poll_router.post('', async (req, res) => {

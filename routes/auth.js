@@ -2,10 +2,10 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const auth = express.Router();
 const mailService = require('../services/mail.service');
-const { validate_login } = require('../middleware/validate');
+const { validate_login } = require('../middleware/Validator');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
-const hashPassword = require('../middleware/hashPassword');
+const hashPassword = require('../helpers/HashPassword');
 const {
     getUserByInformation,
     addUser

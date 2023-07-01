@@ -1,4 +1,4 @@
-const knex = require('./connection');
+const knex = require('./Connection');
 
 // POLLS API
 const createPoll = async (pollData) => {

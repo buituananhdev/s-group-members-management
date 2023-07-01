@@ -3,13 +3,15 @@ const app = express();
 // Require user route
 const userRoutes = require('./routes/user');
 const authRoutes = require('./routes/auth');
-const poll_router = require('./routes/polls');
+const pollRoutes = require('./routes/polls');
+const authorizationRoutes = require('./routes/authorization')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/users', userRoutes);
 app.use('/auth', authRoutes);
-app.use('/polls', poll_router);
+app.use('/polls', pollRoutes);
+app.use('/authorization', authorizationRoutes)
 // ... Other routes
 
 
