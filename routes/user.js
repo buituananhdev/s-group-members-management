@@ -1,9 +1,9 @@
 const express = require('express');
 const user_router = express.Router();
-const { validate_name } = require('../middleware/validate');
-const authentication = require('../middleware/authentication');
-const authorization = require('../middleware/authorization');
-const getCreatedBy = require('../middleware/getCreatedBy');
+const { validate_name } = require('../middleware/Validator');
+const authentication = require('../middleware/Authentication');
+const authorization = require('../middleware/Authorization');
+const getCreatedBy = require('../helpers/GetCreatedBy');
 user_router.use(express.json());
 user_router.use(express.urlencoded({ extended: true }));
 const {

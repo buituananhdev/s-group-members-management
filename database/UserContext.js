@@ -1,5 +1,5 @@
-const knex = require('./connection');
-const hashPassword = require('../middleware/hashPassword');
+const knex = require('./Connection');
+const hashPassword = require('../helpers/HashPassword');
 
 
 // Function to retrieve users with pagination

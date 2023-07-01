@@ -13,7 +13,7 @@ const mailService = {
                 pass: process.env.SMTP_PASS,
             },
         });
-        var token = jwt.sign(
+        const token = jwt.sign(
             { email: emailTo },
             // eslint-disable-next-line no-undef
             process.env.SECRET_KEY,

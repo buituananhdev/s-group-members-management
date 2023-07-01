@@ -25,7 +25,6 @@ const {
     getUserRole,
 } = require('../database/AuthorizationContext');
 
-// Endpoint: POST /role_permission/user_role
 authore.post('/user_role', async (req, res) => {
     const userRoleData = req.body;
 
@@ -51,7 +50,6 @@ authore.get('/user_role/:userRoleId', async (req, res) => {
     }
 })
 
-// Endpoint: GET /role_permission/user_roles
 authore.get('/user_roles', async (req, res) => {
     try {
         const userRoles = await getUserRoles();
@@ -62,7 +60,6 @@ authore.get('/user_roles', async (req, res) => {
     }
 });
 
-// Endpoint: DELETE /role_permission/user_role/:userRoleId
 authore.delete('/user_role/:userRoleId', async (req, res) => {
     const { userRoleId } = req.params;
     try {
@@ -74,7 +71,6 @@ authore.delete('/user_role/:userRoleId', async (req, res) => {
     }
 });
 
-// Endpoint: POST /role_permission/role
 authore.post('/role', async (req, res) => {
     const roleData = req.body;
     try {
@@ -86,7 +82,6 @@ authore.post('/role', async (req, res) => {
     }
 });
 
-// Endpoint: GET /role_permission/roles
 authore.get('/roles', async (req, res) => {
     try {
         const roles = await getRoles();
@@ -97,10 +92,8 @@ authore.get('/roles', async (req, res) => {
     }
 });
 
-// Endpoint: GET /role_permission/role/:roleId
 authore.get('/role/:roleId', async (req, res) => {
     const { roleId } = req.params;
-
     try {
         const role = await getRoleById(roleId);
         res.json(role);
@@ -110,11 +103,9 @@ authore.get('/role/:roleId', async (req, res) => {
     }
 });
 
-// Endpoint: PUT /role_permission/role/:roleId
 authore.put('/role/:roleId', async (req, res) => {
     const { roleId } = req.params;
     const updatedRoleData = req.body;
-
     try {
         const updatedRole = await updateRole(roleId, updatedRoleData);
         res.json(updatedRole);
@@ -124,10 +115,8 @@ authore.put('/role/:roleId', async (req, res) => {
     }
 });
 
-// Endpoint: DELETE /role_permission/role/:roleId
 authore.delete('/role/:roleId', async (req, res) => {
     const { roleId } = req.params;
-
     try {
         const deletedRole = await deleteRole(roleId);
         res.json(deletedRole);
@@ -137,7 +126,6 @@ authore.delete('/role/:roleId', async (req, res) => {
     }
 });
 
-// Endpoint: POST /role_permission/role_permission
 authore.post('/role_permission', async (req, res) => {
     const rolePermissionData = req.body;
 
@@ -150,7 +138,6 @@ authore.post('/role_permission', async (req, res) => {
     }
 });
 
-// Endpoint: GET /role_permission/role_permissions
 authore.get('/role_permissions', async (req, res) => {
     try {
         const rolePermissions = await getRolePermissions();
@@ -161,10 +148,8 @@ authore.get('/role_permissions', async (req, res) => {
     }
 });
 
-// Endpoint: DELETE /role_permission/role_permission/:rolePermissionId
 authore.delete('/role_permission/:rolePermissionId', async (req, res) => {
     const { rolePermissionId } = req.params;
-
     try {
         const deletedRolePermission = await deleteRolePermission(
             rolePermissionId
@@ -176,10 +161,8 @@ authore.delete('/role_permission/:rolePermissionId', async (req, res) => {
     }
 });
 
-// Endpoint: POST /role_permission/permission
 authore.post('/permission', async (req, res) => {
     const permissionData = req.body;
-
     try {
         const permission = await createPermission(permissionData);
         res.json(permission);
@@ -189,7 +172,6 @@ authore.post('/permission', async (req, res) => {
     }
 });
 
-// Endpoint: GET /role_permission/permissions
 authore.get('/permissions', async (req, res) => {
     try {
         const permissions = await getPermissions();
@@ -200,10 +182,8 @@ authore.get('/permissions', async (req, res) => {
     }
 });
 
-// Endpoint: GET /role_permission/permission/:permissionId
 authore.get('/permission/:permissionId', async (req, res) => {
     const { permissionId } = req.params;
-
     try {
         const permission = await getPermissionById(permissionId);
         res.json(permission);
@@ -213,11 +193,9 @@ authore.get('/permission/:permissionId', async (req, res) => {
     }
 });
 
-// Endpoint: PUT /role_permission/permission/:permissionId
 authore.put('/permission/:permissionId', async (req, res) => {
     const { permissionId } = req.params;
     const updatedPermissionData = req.body;
-
     try {
         const updatedPermission = await updatePermission(
             permissionId,
@@ -230,10 +208,8 @@ authore.put('/permission/:permissionId', async (req, res) => {
     }
 });
 
-// Endpoint: DELETE /role_permission/permission/:permissionId
 authore.delete('/permission/:permissionId', async (req, res) => {
     const { permissionId } = req.params;
-
     try {
         const deletedPermission = await deletePermission(permissionId);
         res.json(deletedPermission);
@@ -243,10 +219,8 @@ authore.delete('/permission/:permissionId', async (req, res) => {
     }
 });
 
-// Endpoint: POST /role_permission/permission_group
 authore.post('/permission_group', async (req, res) => {
     const permissionGroupData = req.body;
-
     try {
         const permissionGroup = await createPermissionGroup(
             permissionGroupData
@@ -258,7 +232,6 @@ authore.post('/permission_group', async (req, res) => {
     }
 });
 
-// Endpoint: GET /role_permission/permission_groups
 authore.get('/permission_groups', async (req, res) => {
     try {
         const permissionGroups = await getPermissionGroups();
@@ -269,11 +242,9 @@ authore.get('/permission_groups', async (req, res) => {
     }
 });
 
-// Endpoint: PUT /role_permission/permission_group/:permissionGroupId
 authore.put('/permission_group/:permissionGroupId', async (req, res) => {
     const { permissionGroupId } = req.params;
     const updatedPermissionGroupData = req.body;
-
     try {
         const updatedPermissionGroup = await updatePermissionGroup(
             permissionGroupId,
@@ -286,10 +257,8 @@ authore.put('/permission_group/:permissionGroupId', async (req, res) => {
     }
 });
 
-// Endpoint: DELETE /role_permission/permission_group/:permissionGroupId
 authore.delete('/permission_group/:permissionGroupId', async (req, res) => {
     const { permissionGroupId } = req.params;
-
     try {
         const deletedPermissionGroup = await deletePermissionGroup(
             permissionGroupId
