@@ -1,6 +1,6 @@
 const express = require('express');
 const poll_router = express.Router();
-const authentication = require('../middleware/Authentication');
+const authentication = require('../middleware/authentication');
 poll_router.use(express.json());
 poll_router.use(express.urlencoded({ extended: true }));
 const {

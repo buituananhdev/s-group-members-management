@@ -1,7 +1,7 @@
 const express = require('express');
 const authore = express.Router();
-auth.use(express.json());
-auth.use(express.urlencoded({ extended: true }));
+authore.use(express.json());
+authore.use(express.urlencoded({ extended: true }));
 
 const {
     createUserRole,

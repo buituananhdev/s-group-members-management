@@ -38,7 +38,7 @@ const addUser = async (userData) => {
     const created_at = new Date();
     const { hashPass, salt } = hashPassword(password);
     try {
-        const user = await knex('Users').insert({
+        const [user] = await knex('Users').insert({
             fullname,
             gender,
             age,
