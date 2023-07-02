@@ -2,7 +2,7 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const auth = express.Router();
 const mailService = require('../services/mail.service');
-const { validate_login } = require('../middleware/Validator');
+const { validate_login } = require('../middleware/validator');
 auth.use(express.json());
 auth.use(express.urlencoded({ extended: true }));
 const hashPassword = require('../helpers/HashPassword');
@@ -16,7 +16,7 @@ const {
     getUserRole
 } = require('../database/AuthorizationContext')
 auth.post('/register', async (req, res) => {
-    const { fullname, gender, age, username, password, email, role_id } = req.body;
+    const { fullname, gender, age, username, password, email } = req.body;
 
     try {
         const user = await getUserByInformation('username', username);
@@ -29,7 +29,7 @@ auth.post('/register', async (req, res) => {
     }
     const created_by = null;
     try {
-        const result = await addUser({
+        const user = await addUser({
             fullname,
             gender,
             age,
@@ -38,8 +38,8 @@ auth.post('/register', async (req, res) => {
             username,
             password,
         });
-        await createUserRole(result.id, role_id);
-        return res.status(201).send({status: 'success', data: result});
+        await createUserRole({ user_id: user, role_id: 1});
+        return res.status(201).send({status: 'success', data: user});
     } catch (error) {
         console.error(error);
         return res.status(500).send('Error register');

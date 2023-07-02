@@ -111,6 +111,19 @@ const createRolePermission = async (rolePermissionData) => {
     }
 };
 
+const getSigleRolePermission = async (roleID, permissionID) => {
+    try {
+        const [rolePermission] = await knex('RolePermission').select('*').where({
+            role_id: roleID,
+            permission_id: permissionID
+            });
+        return rolePermission;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error retrieving role permissions');
+    }
+}
+
 const getRolePermissions = async () => {
     try {
         const rolePermissions = await knex('RolePermission').select('*');
@@ -248,5 +261,6 @@ module.exports = {
     getPermissionGroups,
     updatePermissionGroup,
     deletePermissionGroup,
-    getRoleById
+    getRoleById,
+    getSigleRolePermission
 };

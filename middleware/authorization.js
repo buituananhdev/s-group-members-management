@@ -1,18 +1,14 @@
 const {
-    getRoleById
+    getSigleRolePermission
 } = require('../database/AuthorizationContext');
-function authorization(roles) {
+function authorization(permissionID) {
     return async (req, res, next) => {
         const userRoles = req.body.user_role;
-        const roleNames = [];
-        for(let i = 0;i< userRoles.length;i++) {
-            console.log(userRoles[i].role_id);
-            roleNames[i] = await getRoleById(userRoles[i].role_id)
+        const checkArr = [];
+        for(let i = 0;i < userRoles.length;i++) {
+            checkArr[i] = await getSigleRolePermission(userRoles[i].role_id, permissionID)
         }
-        const hasAuthorizedRole = roleNames.some((roleName) =>
-            roles.includes(roleName)
-        );
-        if (!hasAuthorizedRole) {
+        if (checkArr.length <= 0 || !checkArr.some(item => item !== undefined)) {
             return res.status(403).json({ message: 'Unauthorized access' });
         } else {
             next();

@@ -1,8 +1,8 @@
 const express = require('express');
 const user_router = express.Router();
-const { validate_name } = require('../middleware/Validator');
-const authentication = require('../middleware/Authentication');
-const authorization = require('../middleware/Authorization');
+const { validate_name } = require('../middleware/validator');
+const authentication = require('../middleware/authentication');
+const authorization = require('../middleware/authorization');
 const getCreatedBy = require('../helpers/GetCreatedBy');
 user_router.use(express.json());
 user_router.use(express.urlencoded({ extended: true }));
@@ -22,7 +22,7 @@ const {
 user_router.get(
     '',
     authentication,
-    authorization(['admin', 'moderator']),
+    authorization(2),
     async (req, res) => {
         try {
             const PAGE_SIZE = parseInt(req.query.pageSize) || 10;
@@ -56,7 +56,7 @@ user_router.get(
 user_router.get(
     '/:id',
     authentication,
-    authorization(['admin', 'moderator']),
+    authorization(2),
     async (req, res) => {
         const id = parseInt(req.params.id);
 
@@ -79,7 +79,7 @@ user_router.get(
 user_router.post(
     '',
     authentication,
-    authorization(['admin', 'moderator']),
+    authorization(1),
     validate_name,
     getCreatedBy,
     async (req, res) => {
@@ -93,20 +93,27 @@ user_router.post(
             created_by,
             role_id,
         } = req.body;
-        const created_at = new Date();
+        try {
+            const user = await getUserByInformation('username', username);
+            if (user) {
+                return res.status(404).send('Username already exists');
+            }
+        } catch (error) {
+            console.error(error);
+            return res.status(500).send('Error retrieving user');
+        }
 
         try {
             const user = await addUser({
                 fullname,
                 gender,
                 age,
-                created_at,
                 created_by,
                 email,
                 username,
                 password,
             });
-            await createUserRole(user.id, role_id);
+            await createUserRole({ user_id: user, role_id: role_id});
             return res.status(200).json({ status: 'success', data: user });
         } catch (error) {
             console.error(error);
@@ -121,7 +128,7 @@ user_router.post(
 user_router.delete(
     '/:id',
     authentication,
-    authorization(['admin', 'moderator']),
+    authorization(4),
     async (req, res) => {
         const id = parseInt(req.params.id);
 
@@ -151,7 +158,7 @@ user_router.delete(
 user_router.put(
     '/:id',
     authentication,
-    authorization(['admin', 'moderator']),
+    authorization(3),
     validate_name,
     async (req, res) => {
         const id = parseInt(req.params.id);
