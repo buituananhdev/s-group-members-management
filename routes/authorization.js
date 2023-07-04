@@ -18,10 +18,6 @@ const {
     getPermissions,
     updatePermission,
     deletePermission,
-    createPermissionGroup,
-    getPermissionGroups,
-    updatePermissionGroup,
-    deletePermissionGroup,
     getUserRole,
 } = require('../database/AuthorizationContext');
 
@@ -216,57 +212,6 @@ authore.delete('/permission/:permissionId', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Failed to delete permission' });
-    }
-});
-
-authore.post('/permission_group', async (req, res) => {
-    const permissionGroupData = req.body;
-    try {
-        const permissionGroup = await createPermissionGroup(
-            permissionGroupData
-        );
-        res.json(permissionGroup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to create permission group' });
-    }
-});
-
-authore.get('/permission_groups', async (req, res) => {
-    try {
-        const permissionGroups = await getPermissionGroups();
-        res.json(permissionGroups);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to retrieve permission groups' });
-    }
-});
-
-authore.put('/permission_group/:permissionGroupId', async (req, res) => {
-    const { permissionGroupId } = req.params;
-    const updatedPermissionGroupData = req.body;
-    try {
-        const updatedPermissionGroup = await updatePermissionGroup(
-            permissionGroupId,
-            updatedPermissionGroupData
-        );
-        res.json(updatedPermissionGroup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to update permission group' });
-    }
-});
-
-authore.delete('/permission_group/:permissionGroupId', async (req, res) => {
-    const { permissionGroupId } = req.params;
-    try {
-        const deletedPermissionGroup = await deletePermissionGroup(
-            permissionGroupId
-        );
-        res.json(deletedPermissionGroup);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to delete permission group' });
     }
 });
 

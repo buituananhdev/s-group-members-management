@@ -191,55 +191,6 @@ const deletePermission = async (permissionID) => {
     }
 };
 
-// PERMISSION GROUP API
-const createPermissionGroup = async (permissionGroupData) => {
-    try {
-        const permissionGroup = await knex('PermissionGroup').insert(
-            permissionGroupData
-        );
-        return permissionGroup;
-    } catch (error) {
-        console.error(error);
-        throw new Error('Error adding permission group');
-    }
-};
-
-const getPermissionGroups = async () => {
-    try {
-        const permissionGroups = await knex('PermissionGroup').select('*');
-        return permissionGroups;
-    } catch (error) {
-        console.error(error);
-        throw new Error('Error retrieving permission groups');
-    }
-};
-
-const updatePermissionGroup = async (
-    permissionGroupID,
-    updatedPermissionGroupData
-) => {
-    try {
-        const updatedPermissionGroup = await knex('PermissionGroup')
-            .where('PermissionGroupID', permissionGroupID)
-            .update(updatedPermissionGroupData);
-        return updatedPermissionGroup;
-    } catch (error) {
-        console.error(error);
-        throw new Error('Error updating permission group');
-    }
-};
-
-const deletePermissionGroup = async (permissionGroupID) => {
-    try {
-        const deletedPermissionGroup = await knex('PermissionGroup')
-            .where('PermissionGroupID', permissionGroupID)
-            .del();
-        return deletedPermissionGroup;
-    } catch (error) {
-        console.error(error);
-        throw new Error('Error deleting permission group');
-    }
-};
 
 module.exports = {
     createUserRole,
@@ -257,10 +208,6 @@ module.exports = {
     getPermissions,
     updatePermission,
     deletePermission,
-    createPermissionGroup,
-    getPermissionGroups,
-    updatePermissionGroup,
-    deletePermissionGroup,
     getRoleById,
     getSigleRolePermission
 };
