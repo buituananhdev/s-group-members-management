@@ -3,27 +3,42 @@ const hashPassword = require('../helpers/HashPassword');
 
 
 // Function to retrieve users with pagination
-const getUsers = async (page, pageSize, email, fullname) => {
+const getUsers = async (page, pageSize, searchval) => {
     const offset = (page - 1) * pageSize;
-    const query = knex('Users')
-        .select('*')
-        .where('email', 'like', `%${email}%`)
-        .andWhere('fullname', 'like', `%${fullname}%`)
-        .offset(offset)
-        .limit(pageSize);
+    let query;
+    if (searchval) {
+        query = knex('Users')
+            .select('*')
+            .where('email', 'like', `%${searchval}%`)
+            .orWhere('fullname', 'like', `%${searchval}%`)
+            .offset(offset)
+            .limit(pageSize);
+    } else {
+        query = knex('Users')
+            .select('*')
+            .offset(offset)
+            .limit(pageSize);
+    }
+
     const users = await query;
-    const totalCountQuery = knex('Users')
-        .count('id as count')
-        .where('email', 'like', `%${email}%`)
-        .andWhere('fullname', 'like', `%${fullname}%`);
-    const totalCount = await totalCountQuery;
-    const totalPages = Math.ceil(totalCount[0].count / pageSize);
+    let totalCountQuery = knex('Users').count('id as count');
+    if (searchval) {
+        totalCountQuery = totalCountQuery
+            .where('email', 'like', `%${searchval}%`)
+            .orWhere('fullname', 'like', `%${searchval}%`);
+    }
+
+    const totalCountResult = await totalCountQuery;
+    const totalCount = totalCountResult[0].count;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
     return {
         users,
         totalPages,
-        totalCount: totalCount[0].count,
+        totalCount,
     };
 };
+
 
 // Function to get user information by id
 const getUserByInformation = async (type, data) => {

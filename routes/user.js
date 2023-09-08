@@ -1,6 +1,6 @@
 const express = require('express');
 const user_router = express.Router();
-const { validate_name } = require('../middleware/validator');
+const { validate_name } = require('../helpers/validator');
 const authentication = require('../middleware/authentication');
 const authorization = require('../middleware/authorization');
 const getCreatedBy = require('../helpers/GetCreatedBy');
@@ -21,18 +21,14 @@ const {
 // Get users with pagination
 user_router.get(
     '',
-    authentication,
-    authorization(2),
     async (req, res) => {
         try {
             const PAGE_SIZE = parseInt(req.query.pageSize) || 10;
-            const { page = 1, email = '', fullname = '' } = req.query;
-
+            const { page = 1, searchval = '' } = req.query;
             const { users, totalPages, totalCount } = await getUsers(
                 page,
                 PAGE_SIZE,
-                email,
-                fullname
+                searchval
             );
 
             return res.status(200).json({
@@ -127,8 +123,8 @@ user_router.post(
 // Delete user by id
 user_router.delete(
     '/:id',
-    authentication,
-    authorization(4),
+    // authentication,
+    // authorization(4),
     async (req, res) => {
         const id = parseInt(req.params.id);
 
