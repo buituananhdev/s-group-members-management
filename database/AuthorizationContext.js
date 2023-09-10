@@ -1,4 +1,4 @@
-const knex = require('./Connection');
+const knex = require('./connection');
 // USER ROLE API
 const createUserRole = async (userRoleData) => {
     try {

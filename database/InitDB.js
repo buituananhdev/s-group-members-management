@@ -1,4 +1,4 @@
-const knex = require('./Connection');
+const knex = require('./connection');
 require('dotenv').config();
 
 async function createTable() {
